@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Baguette - Formula de hoy</title>
+    <meta name="theme-color" content="#b8863a">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Baguette">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            background: #f8f4ec;
+            color: #3a3a3a;
+            line-height: 1.4;
+        }
+        h1 { font-size: 20px; text-align: center; color: #7a4a21; margin: 8px 0 16px; }
+        .tarjeta {
+            background: #fff;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+        }
+        label { display: block; font-size: 13px; font-weight: bold; margin: 8px 0 3px; color: #555; }
+        input, select {
+            width: 100%;
+            padding: 9px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .fila { display: flex; gap: 8px; }
+        .fila > div { flex: 1; }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 12px;
+            background: #b8863a;
+            color: #fff;
+            font-weight: bold;
+        }
+        .btn2 { background: #7a4a21; }
+        .resultado { font-size: 14px; }
+        .resultado table { width: 100%; border-collapse: collapse; }
+        .resultado td { padding: 5px 2px; border-bottom: 1px solid #eee; }
+        .resultado td.num { text-align: right; font-weight: bold; }
+        .total-bien { color: #2e7d32; font-weight: bold; }
+        .nota { font-size: 12px; color: #888; margin-top: 4px; }
+        .mensaje { font-size: 13px; margin-top: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>PAN BAGUETTE - Formula de hoy</h1>
+
+    <div class="tarjeta">
+        <label>Nombre de la receta
+            <select id="selectReceta" onchange="cargarReceta()"></select>
+        </label>
+        <button class="btn btn2" onclick="guardarReceta()">Guardar receta como la de abajo</button>
+    </div>
+
+    <div class="tarjeta">
+        <div class="fila">
+            <div>
+                <label>Unidades</label>
+                <input type="number" id="unidades" value="18">
+            </div>
+            <div>
+                <label>Peso por unidad (g)</label>
+                <input type="number" id="peso" value="570">
+            </div>
+        </div>
+        <div class="nota">La masa total se calcula sola.</div>
+    </div>
+
+    <div class="tarjeta">
+        <h1 style="font-size:15px; margin:0 0 4px; text-align:left;">Porcentajes sobre la HARINA</h1>
+        <div class="fila">
+            <div>
+                <label>Extrapan %</label>
+                <input type="number" id="extrapan" value="94" step="0.1">
+            </div>
+            <div>
+                <label>Semola %</label>
+                <input type="number" id="semola" value="6" step="0.1">
+            </div>
+        </div>
+        <div class="fila">
+            <div>
+                <label>Agua %</label>
+                <input type="number" id="agua" value="67" step="0.1">
+            </div>
+            <div>
+                <label>Sal %</label>
+                <input type="number" id="sal" value="2" step="0.1">
+            </div>
+        </div>
+        <div class="fila">
+            <div>
+                <label>Levadura seca %</label>
+                <input type="number" id="levadura" value="0.2" step="0.1">
+            </div>
+            <div>
+                <label>Masa madre %</label>
+                <input type="number" id="mm" value="20" step="0.1">
+            </div>
+        </div>
+    </div>
+
+    <button class="btn" onclick="calcular()">CALCULAR</button>
+
+    <div class="tarjeta resultado" id="resultado"></div>
+
+    <script>
+        const LLAVE = 'recetasBaguette';
+        let recetas = cargarLista();
+
+        function cargarLista() {
+            try { return JSON.parse(localStorage.getItem(LLAVE)) || {}; }
+            catch (e) { return {}; }
+        }
+        function guardarLista() {
+            localStorage.setItem(LLAVE, JSON.stringify(recetas));
+        }
+        function llenarSelect() {
+            const sel = document.getElementById('selectReceta');
+            sel.innerHTML = '<option value="">(sin receta)</option>';
+            Object.keys(recetas).sort().forEach(n => {
+                const o = document.createElement('option');
+                o.value = n; o.textContent = n;
+                sel.appendChild(o);
+            });
+        }
+        function cargarReceta() {
+            const n = document.getElementById('selectReceta').value;
+            if (!n || !recetas[n]) return;
+            const r = recetas[n];
+            document.getElementById('extrapan').value = r.extrapan;
+            document.getElementById('semola').value = r.semola;
+            document.getElementById('agua').value = r.agua;
+            document.getElementById('sal').value = r.sal;
+            document.getElementById('levadura').value = r.levadura;
+            document.getElementById('mm').value = r.mm;
+        }
+        function guardarReceta() {
+            const n = prompt('Nombre de la receta:');
+            if (!n) return;
+            recetas[n] = {
+                extrapan: parseFloat(document.getElementById('extrapan').value) || 0,
+                semola: parseFloat(document.getElementById('semola').value) || 0,
+                agua: parseFloat(document.getElementById('agua').value) || 0,
+                sal: parseFloat(document.getElementById('sal').value) || 0,
+                levadura: parseFloat(document.getElementById('levadura').value) || 0,
+                mm: parseFloat(document.getElementById('mm').value) || 0,
+            };
+            guardarLista();
+            llenarSelect();
+            document.getElementById('selectReceta').value = n;
+            alert('Receta "' + n + '" guardada');
+        }
+        function fmt(n) { return n.toLocaleString('es-CO', { maximumFractionDigits: 0 }); }
+
+        function calcular() {
+            const unidades = parseFloat(document.getElementById('unidades').value) || 0;
+            const peso = parseFloat(document.getElementById('peso').value) || 0;
+            const masaTotal = unidades * peso;
+
+            const pe = (parseFloat(document.getElementById('extrapan').value) || 0) / 100;
+            const ps = (parseFloat(document.getElementById('semola').value) || 0) / 100;
+            const pa = (parseFloat(document.getElementById('agua').value) || 0) / 100;
+            const psal = (parseFloat(document.getElementById('sal').value) || 0) / 100;
+            const pl = (parseFloat(document.getElementById('levadura').value) || 0) / 100;
+            const pmm = (parseFloat(document.getElementById('mm').value) || 0) / 100;
+
+            if (unidades <= 0 || peso <= 0) {
+                document.getElementById('resultado').innerHTML =
+                    '<div class="mensaje" style="color:#c62828;">Pon unidades y peso validos</div>';
+                return;
+            }
+
+            const suma = 1 + pa + psal + pl + pmm;
+            const harinaBase = masaTotal / suma;
+
+            const extrapan = harinaBase * pe;
+            const semola = harinaBase * ps;
+            const agua = harinaBase * pa;
+            const sal = harinaBase * psal;
+            const levadura = harinaBase * pl;
+            const masaMadre = harinaBase * pmm;
+
+            const totalCalc = extrapan + semola + agua + sal + levadura + masaMadre;
+            const ok = Math.abs(totalCalc - masaTotal) < 1;
+
+            document.getElementById('resultado').innerHTML =
+                '<table>' +
+                '<tr><td>Unidades x peso</td><td class="num">' + fmt(masaTotal) + ' g</td></tr>' +
+                '<tr><td>Harina extrapan</td><td class="num">' + fmt(extrapan) + ' g</td></tr>' +
+                '<tr><td>Semola</td><td class="num">' + fmt(semola) + ' g</td></tr>' +
+                '<tr><td>Agua</td><td class="num">' + fmt(agua) + ' g</td></tr>' +
+                '<tr><td>Sal</td><td class="num">' + fmt(sal) + ' g</td></tr>' +
+                '<tr><td>Levadura seca</td><td class="num">' + fmt(levadura) + ' g</td></tr>' +
+                '<tr><td>Masa madre</td><td class="num">' + fmt(masaMadre) + ' g</td></tr>' +
+                '<tr><td><b>Total</b></td><td class="num"><b>' + fmt(totalCalc) + ' g</b></td></tr>' +
+                '</table>' +
+                '<div class="mensaje">' +
+                (ok ? '<span class="total-bien">Total correcto (' + fmt(masaTotal) + ' g)</span>'
+                    : '<span style="color:#c62828;">Aviso: total ' + fmt(totalCalc) + ' vs ' + fmt(masaTotal) + ' g</span>') +
+                '</div>';
+        }
+
+        llenarSelect();
+        calcular();
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(function (e) {
+                console.log('SW error', e);
+            });
+        }
+    </script>
+</body>
+</html>

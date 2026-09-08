@@ -1,7 +1,7 @@
 {
   "name": "Pan Baguette - Formula",
   "short_name": "Baguette",
-  "description": "Calculadora de pan baguette",
+  "description": "Calculadora de pan baguette: ingredientes y gramos de la formula de hoy.",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
