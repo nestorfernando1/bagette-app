@@ -92,7 +92,7 @@
             </div>
             <div>
                 <label>Peso por unidad (g)</label>
-                <input type="number" id="peso" value="570" oninput="calcular()">
+                <input type="number" id="peso" value="550" oninput="calcular()">
             </div>
         </div>
         <div class="nota">La masa total se calcula sola.</div>
@@ -249,7 +249,7 @@
             mostrarIng(recetas[n].ing, recetas[n].precios || {});
             const u = document.getElementById('unidades').value;
             const p = document.getElementById('peso').value;
-            if (!u || !p) { document.getElementById('unidades').value = '18'; document.getElementById('peso').value = '570'; }
+            if (!u || !p) { document.getElementById('unidades').value = '18'; document.getElementById('peso').value = '550'; }
             if (recetas[n].precioBolsa !== undefined) {
                 document.getElementById('precioBolsa').value = recetas[n].precioBolsa;
                 document.getElementById('precioBolsa2').value = recetas[n].precioBolsa;

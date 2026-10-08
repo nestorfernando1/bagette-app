@@ -1,5 +1,5 @@
 /* Service Worker: hace que la app funcione sin internet (offline) */
-const CACHE = 'baguette-v2';
+const CACHE = 'baguette-v3';
 const ARCHIVOS = [
     'index.html',
     'manifest.webmanifest',
